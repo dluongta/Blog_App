@@ -99,30 +99,22 @@ const Comment = () => {
     }
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes}/${day}/${month}/${year}`;
+  };
+
   return (
     <div className="comments-section">
       <h3>Comments</h3>
-      <div id="comments-list">
-        {commentList.map((comment) => (
-          <div key={comment.id} className="comment">
-            <div className="comment-body">
-              {comment.body}
-            </div>
-            <div className="comment-footer">
-              <div className="user-info">
-                <img src={comment.author.image} alt={comment.author.username} width="24" />
-                <span className="username">{comment.author.username}</span>
-                <span className="timestamp">{new Date(comment.createdAt).toISOString()}</span>
-              </div>
-              {currentUser && currentUser.username === comment.author.username && (
-                <button className="delete-button" onClick={() => handleDelete(comment.id)}>
-                  <i className="fa fa-trash"></i>
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+
+      {}
       <div className="comment-form">
         <textarea
           id="comment-input"
@@ -131,7 +123,32 @@ const Comment = () => {
           value={comment}
           onChange={handleInputChange}
         />
-        <button onClick={handleSubmit}>Post Comment</button>
+        <div className="comment-submit-button">
+          <button onClick={handleSubmit}>Post Comment</button>
+        </div>
+      </div>
+
+      {}
+      <div id="comments-list">
+        {commentList.slice().reverse().map((comment) => (
+          <div key={comment.id} className="comment">
+            <div className="comment-footer">
+              <div className="user-info">
+                <img src={comment.author.image} alt={comment.author.username} width="24" />
+                <span className="username">{comment.author.username}</span>
+                <span className="timestamp">{formatDate(comment.createdAt)}</span>
+              </div>
+              <div className="comment-body">
+                {comment.body}
+              </div>
+            </div>
+            {currentUser && currentUser.username === comment.author.username && (
+              <button className="delete-button" onClick={() => handleDelete(comment.id)}>
+                <i className="fa fa-trash"></i>
+              </button>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

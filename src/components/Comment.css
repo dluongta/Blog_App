@@ -4,12 +4,25 @@
 
 .comment-form {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.comment-submit-button {
   margin-top: 10px;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
+  text-align: right;
+}
+
+.comment-submit-button button {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
   border-radius: 4px;
+}
+
+.comment-submit-button button:hover {
+  background-color: #218838;
 }
 
 .comment-form textarea {
@@ -47,8 +60,13 @@
 
 .comment .comment-footer {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.comment .comment-body {
+  margin-top: 5px;
 }
 
 .comment .comment-footer .user-info {

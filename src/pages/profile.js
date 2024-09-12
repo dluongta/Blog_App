@@ -17,6 +17,7 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest");
   const { username } = useParams();
+  const [currentUser, setCurrentUser] = useState(null);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -27,6 +28,21 @@ const Profile = () => {
       console.error("Error fetching profile:", error);
     }
   }, [username]);
+
+  const fetchCurrentUser = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("jwt");
+      if (token) {
+        const response = await axios.get(`${API_BASE_URL}/user`, {
+          headers: { Authorization: `Token ${token}` },
+        });
+        setCurrentUser(response.data.user);
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
+  }, []);
 
   const fetchArticles = useCallback(async () => {
     setIsLoading(true);
@@ -124,12 +140,20 @@ const Profile = () => {
 
   useEffect(() => {
     fetchProfile();
+    fetchCurrentUser();
     if (activeTab === "my-articles") {
       fetchArticles();
     } else if (activeTab === "favorited-articles") {
       fetchFavoritedArticles();
     }
-  }, [fetchProfile, fetchArticles, fetchFavoritedArticles, activeTab, page]);
+  }, [
+    fetchProfile,
+    fetchArticles,
+    fetchFavoritedArticles,
+    fetchCurrentUser,
+    activeTab,
+    page,
+  ]);
 
   const handleFavorite = (slug) => {
     if (!isLoggedIn) {
@@ -187,12 +211,14 @@ const Profile = () => {
               />
               <h4>{profile.username}</h4>
               <p>{profile.bio}</p>
-              <a
-                href="/settings"
-                className="btn btn-sm btn-outline-secondary action-btn"
-              >
-                <IoIosSettings /> Edit Profile Settings
-              </a>
+              {currentUser && currentUser.username === profile.username && (
+                <a
+                  href="/settings"
+                  className="btn btn-sm btn-outline-secondary action-btn"
+                >
+                  <IoIosSettings /> Edit Profile Settings
+                </a>
+              )}
             </div>
           </div>
         </div>
