@@ -1,0 +1,88 @@
+.settings-page {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.settings-page.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
+
+.settings-page.dark-mode .form-control {
+  background-color: #555;
+  color: #fff;
+  border-color: #777;
+}
+
+.settings-page.dark-mode .btn-primary {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.settings-page.dark-mode .btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.settings-page.dark-mode .btn-outline-danger:hover {
+  color: #fff;
+  background-color: #dc3545;
+}
+
+.sidebar {
+  padding: 20px 0;
+}
+
+.sidebar .nav-item {
+  margin-bottom: 15px;
+}
+
+.sidebar .nav-link {
+  color: #333;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.settings-page.dark-mode .sidebar .nav-link {
+  color: #fff;
+  background-color: #444;
+}
+
+.sidebar .nav-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.sidebar .nav-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.settings-page.dark-mode .sidebar .nav-link.active {
+  background-color: #0056b3;
+}
+
+.sidebar .nav-link:not(.active) {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.settings-page.dark-mode .sidebar .nav-link:not(.active) {
+  background-color: #555;
+  border: 1px solid #777;
+}
+
+.show-pw-group {
+  font-size: 1.2rem;
+}
+
+.showPW {
+  margin-left: 10px;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
