@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './Comment.css';
 
@@ -8,7 +8,6 @@ const Comment = () => {
   const [commentList, setCommentList] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const { slug } = useParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch current user information
@@ -31,11 +30,7 @@ const Comment = () => {
 
   useEffect(() => {
     if (slug) {
-      axios.get(`https://node-express-conduit.appspot.com/api/articles/${slug}/comments`, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('jwt')
-        }
-      })
+      axios.get(`https://node-express-conduit.appspot.com/api/articles/${slug}/comments`)
         .then(response => {
           setCommentList(response.data.comments);
         })
@@ -114,7 +109,6 @@ const Comment = () => {
     <div className="comments-section">
       <h3>Comments</h3>
 
-      {}
       <div className="comment-form">
         <textarea
           id="comment-input"
@@ -128,7 +122,6 @@ const Comment = () => {
         </div>
       </div>
 
-      {}
       <div id="comments-list">
         {commentList.slice().reverse().map((comment) => (
           <div key={comment.id} className="comment">

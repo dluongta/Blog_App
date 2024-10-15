@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Comment from '../components/Comment';
-import { IoIosCreate,IoIosTrash } from "react-icons/io";
-
+import { IoIosCreate, IoIosTrash } from "react-icons/io";
 
 const API_BASE_URL = 'https://node-express-conduit.appspot.com/api';
 
@@ -21,7 +20,6 @@ const ArticlePage = () => {
     const token = localStorage.getItem('jwt');
     if (token) {
       setIsLoggedIn(true);
-
       axios.get(`${API_BASE_URL}/user`, { headers: getAuthHeader() })
         .then(response => {
           setCurrentUser(response.data.user);
@@ -31,6 +29,7 @@ const ArticlePage = () => {
         });
     }
 
+    // Fetch article details
     axios.get(`${API_BASE_URL}/articles/${slug}`)
       .then(response => {
         setArticle(response.data.article);
@@ -39,6 +38,15 @@ const ArticlePage = () => {
       })
       .catch(error => {
         console.error('Error fetching article:', error);
+      });
+
+    // Fetch comments for the article
+    axios.get(`${API_BASE_URL}/articles/${slug}/comments`)
+      .then(response => {
+        setComments(response.data.comments);
+      })
+      .catch(error => {
+        console.error('Error fetching comments:', error);
       });
   }, [slug]);
 
@@ -56,11 +64,7 @@ const ArticlePage = () => {
     const method = isFollowing ? 'delete' : 'post';
     const url = `${API_BASE_URL}/profiles/${article.author.username}/follow`;
 
-    axios({
-      method,
-      url,
-      headers: getAuthHeader()
-    })
+    axios({ method, url, headers: getAuthHeader() })
       .then(response => {
         setIsFollowing(!isFollowing);
         setArticle(prevArticle => ({
@@ -85,11 +89,7 @@ const ArticlePage = () => {
     const method = isFavorited ? 'delete' : 'post';
     const url = `${API_BASE_URL}/articles/${slug}/favorite`;
 
-    axios({
-      method,
-      url,
-      headers: getAuthHeader()
-    })
+    axios({ method, url, headers: getAuthHeader() })
       .then(response => {
         if (response.data && response.data.article) {
           setIsFavorited(!isFavorited);
@@ -113,7 +113,6 @@ const ArticlePage = () => {
 
     axios.delete(`${API_BASE_URL}/articles/${slug}`, { headers: getAuthHeader() })
       .then(() => {
-        // Redirect to the home page or another page after deletion
         navigate('/');
       })
       .catch(error => {
@@ -136,8 +135,8 @@ const ArticlePage = () => {
       <div className="banner" style={{ backgroundColor: 'antiquewhite', color:'#373a3c' }}>
         <div className="container">
           <h1>{article.title}</h1>
-          <div className="article-meta" >
-            <Link to={`/profile/${article.author.username}`} >
+          <div className="article-meta">
+            <Link to={`/profile/${article.author.username}`}>
               <img src={article.author.image} alt={article.author.username} />
             </Link>
             <div className="info">
@@ -150,16 +149,10 @@ const ArticlePage = () => {
               <div className="actions">
                 {isArticleAuthor ? (
                   <>
-                    <Link
-                      to={`/editor/${slug}`}
-                      className="btn btn-outline-secondary btn-sm"
-                    >
+                    <Link to={`/editor/${slug}`} className="btn btn-outline-secondary btn-sm">
                       <IoIosCreate/> Edit Article
                     </Link>
-                    <button
-                      onClick={handleDelete}
-                      className="btn btn-outline-danger btn-sm"
-                    >
+                    <button onClick={handleDelete} className="btn btn-outline-danger btn-sm">
                       <IoIosTrash/> Delete Article
                     </button>
                   </>

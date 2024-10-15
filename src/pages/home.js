@@ -205,7 +205,14 @@ const Home = () => {
                         {article.author.username}
                       </a>
                       <span className="date">
-                        {new Date(article.createdAt).toDateString()}
+                      {new Date(article.createdAt).toLocaleString('vi-VN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                      })}
                       </span>
                     </div>
                     <button
