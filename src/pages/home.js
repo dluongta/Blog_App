@@ -4,8 +4,7 @@ import { IoIosHeart } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "./home.css";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from "react-router-dom";
 
 const API_BASE_URL = "https://node-express-conduit.appspot.com/api";
 
@@ -56,7 +55,8 @@ const Home = () => {
 
     let url;
     if (feedType === "your" && currentUser) {
-      url = `${API_BASE_URL}/articles?author=${currentUser.username}&limit=10&page=${page}`;
+      // Fetch articles from users the current user follows
+      url = `${API_BASE_URL}/articles/feed?limit=10&page=${page}`;
     } else if (selectedTag) {
       url = `${API_BASE_URL}/articles?tag=${selectedTag}&limit=10&page=${page}`;
     } else {
@@ -134,7 +134,7 @@ const Home = () => {
       });
   };
 
-  const filteredTags = tags.filter(tag => 
+  const filteredTags = tags.filter(tag =>
     tag.toLowerCase().includes(tagSearch.toLowerCase()) && tag.trim() !== ''
   ).slice(0, 10);
 

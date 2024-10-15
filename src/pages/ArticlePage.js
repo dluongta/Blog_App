@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Comment from '../components/Comment';
 import { IoIosCreate, IoIosTrash } from "react-icons/io";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_BASE_URL = 'https://node-express-conduit.appspot.com/api';
 
@@ -18,46 +20,60 @@ const ArticlePage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
-    if (token) {
-      setIsLoggedIn(true);
-      axios.get(`${API_BASE_URL}/user`, { headers: getAuthHeader() })
-        .then(response => {
-          setCurrentUser(response.data.user);
-        })
-        .catch(error => {
-          console.error('Error fetching current user:', error);
+
+    // Fetch current user and article details
+    const fetchData = async () => {
+      if (token) {
+        setIsLoggedIn(true);
+        try {
+          const userResponse = await axios.get(`${API_BASE_URL}/user`, { headers: { Authorization: `Token ${token}` } });
+          setCurrentUser(userResponse.data.user);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+
+      try {
+        const articleResponse = await axios.get(`${API_BASE_URL}/articles/${slug}`);
+        setArticle(articleResponse.data.article);
+
+        // Fetch follow status
+        const followResponse = await axios.get(`${API_BASE_URL}/profiles/${articleResponse.data.article.author.username}`, {
+          headers: { Authorization: token ? `Token ${token}` : undefined },
         });
-    }
+        setIsFollowing(followResponse.data.profile.following);
 
-    // Fetch article details
-    axios.get(`${API_BASE_URL}/articles/${slug}`)
-      .then(response => {
-        setArticle(response.data.article);
-        setIsFollowing(response.data.article.author.following);
-        setIsFavorited(response.data.article.favorited);
-      })
-      .catch(error => {
-        console.error('Error fetching article:', error);
-      });
+        // Fetch favorite status
+          const favoriteResponse = await axios.get(`${API_BASE_URL}/articles/${slug}`, {
+            headers: { Authorization: `Token ${token}` },
+          });
 
-    // Fetch comments for the article
-    axios.get(`${API_BASE_URL}/articles/${slug}/comments`)
-      .then(response => {
-        setComments(response.data.comments);
-      })
-      .catch(error => {
+          setIsFavorited(favoriteResponse.data.article.favorited);
+        
+      } catch (error) {
+        console.error('Error fetching article or follow status:', error);
+      }
+
+      // Fetch comments for the article
+      try {
+        const commentsResponse = await axios.get(`${API_BASE_URL}/articles/${slug}/comments`);
+        setComments(commentsResponse.data.comments);
+      } catch (error) {
         console.error('Error fetching comments:', error);
-      });
+      }
+    };
+
+    fetchData();
   }, [slug]);
 
   const getAuthHeader = () => {
     const token = localStorage.getItem('jwt');
-    return token ? { 'Authorization': `Token ${token}` } : {};
+    return token ? { Authorization: `Token ${token}` } : {};
   };
 
   const handleFollow = () => {
     if (!isLoggedIn) {
-      alert("Bạn cần đăng nhập để thực hiện hành động này.");
+      toast.error("Bạn cần đăng nhập để thực hiện hành động này.");
       return;
     }
 
@@ -74,6 +90,7 @@ const ArticlePage = () => {
             following: !isFollowing
           }
         }));
+        toast.success(`Bạn đã ${isFollowing ? 'bỏ theo dõi' : 'theo dõi'} ${article.author.username}`);
       })
       .catch(error => {
         console.error('Error following/unfollowing user:', error);
@@ -82,7 +99,7 @@ const ArticlePage = () => {
 
   const handleFavorite = () => {
     if (!isLoggedIn) {
-      alert("Bạn cần đăng nhập để thực hiện hành động này.");
+      toast.error("Bạn cần đăng nhập để thực hiện hành động này.");
       return;
     }
 
@@ -91,14 +108,13 @@ const ArticlePage = () => {
 
     axios({ method, url, headers: getAuthHeader() })
       .then(response => {
-        if (response.data && response.data.article) {
-          setIsFavorited(!isFavorited);
-          setArticle(prevArticle => ({
-            ...prevArticle,
-            favorited: !isFavorited,
-            favoritesCount: response.data.article.favoritesCount
-          }));
-        }
+        setIsFavorited(!isFavorited);
+        setArticle(prevArticle => ({
+          ...prevArticle,
+          favorited: !isFavorited,
+          favoritesCount: response.data.article.favoritesCount
+        }));
+        toast.success(`Bạn đã ${isFavorited ? 'bỏ thích' : 'thích'} bài viết`);
       })
       .catch(error => {
         console.error('Error favoriting/unfavoriting article:', error);
@@ -107,13 +123,14 @@ const ArticlePage = () => {
 
   const handleDelete = () => {
     if (!isLoggedIn) {
-      alert("Bạn cần đăng nhập để thực hiện hành động này.");
+      toast.error("Bạn cần đăng nhập để thực hiện hành động này.");
       return;
     }
 
     axios.delete(`${API_BASE_URL}/articles/${slug}`, { headers: getAuthHeader() })
       .then(() => {
         navigate('/');
+        toast.success("Bài viết đã được xóa.");
       })
       .catch(error => {
         console.error('Error deleting article:', error);
@@ -132,7 +149,7 @@ const ArticlePage = () => {
 
   return (
     <div className="article-page">
-      <div className="banner" style={{ backgroundColor: 'antiquewhite', color:'#373a3c' }}>
+      <div className="banner" style={{ backgroundColor: 'antiquewhite', color: '#373a3c' }}>
         <div className="container">
           <h1>{article.title}</h1>
           <div className="article-meta">
@@ -140,7 +157,7 @@ const ArticlePage = () => {
               <img src={article.author.image} alt={article.author.username} />
             </Link>
             <div className="info">
-              <Link to={`/profile/${article.author.username}`} className="author" style={{color:'#373a3c' }}>
+              <Link to={`/profile/${article.author.username}`} className="author" style={{ color: '#373a3c' }}>
                 {article.author.username}
               </Link>
               <span className="date">{new Date(article.createdAt).toDateString()}</span>
@@ -150,10 +167,10 @@ const ArticlePage = () => {
                 {isArticleAuthor ? (
                   <>
                     <Link to={`/editor/${slug}`} className="btn btn-outline-secondary btn-sm">
-                      <IoIosCreate/> Edit Article
+                      <IoIosCreate /> Edit Article
                     </Link>
                     <button onClick={handleDelete} className="btn btn-outline-danger btn-sm">
-                      <IoIosTrash/> Delete Article
+                      <IoIosTrash /> Delete Article
                     </button>
                   </>
                 ) : (
@@ -200,6 +217,7 @@ const ArticlePage = () => {
         {/* Comment section */}
         <Comment comments={comments} addComment={addComment} />
       </div>
+      <ToastContainer />
     </div>
   );
 };
