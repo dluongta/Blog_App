@@ -64,11 +64,6 @@ const Comment = () => {
       setComment('');
     } catch (error) {
       console.error('Post comment error', error);
-      if (error.response) {
-        console.error('Error response data:', error.response.data);
-      } else {
-        console.error('Unexpected error occurred. Please try again.');
-      }
     }
   };
 
@@ -86,11 +81,6 @@ const Comment = () => {
       setCommentList(commentList.filter(comment => comment.id !== commentId));
     } catch (error) {
       console.error('Delete comment error', error);
-      if (error.response) {
-        console.error('Error response data:', error.response.data);
-      } else {
-        console.error('Unexpected error occurred. Please try again.');
-      }
     }
   };
 
@@ -109,18 +99,20 @@ const Comment = () => {
     <div className="comments-section">
       <h3>Comments</h3>
 
-      <div className="comment-form">
-        <textarea
-          id="comment-input"
-          placeholder="Write a comment..."
-          rows="4"
-          value={comment}
-          onChange={handleInputChange}
-        />
-        <div className="comment-submit-button">
-          <button onClick={handleSubmit}>Post Comment</button>
+      {currentUser && (
+        <div className="comment-form">
+          <textarea
+            id="comment-input"
+            placeholder="Write a comment..."
+            rows="4"
+            value={comment}
+            onChange={handleInputChange}
+          />
+          <div className="comment-submit-button">
+            <button onClick={handleSubmit}>Post Comment</button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div id="comments-list">
         {commentList.slice().reverse().map((comment) => (
