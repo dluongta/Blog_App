@@ -7,7 +7,6 @@ import "./home.css";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
-
 const API_BASE_URL = "https://node-express-conduit.appspot.com/api";
 
 const Home = () => {
@@ -59,9 +58,9 @@ const Home = () => {
     if (feedType === "your" && currentUser) {
       url = `${API_BASE_URL}/articles?author=${currentUser.username}&limit=10&page=${page}`;
     } else if (selectedTag) {
-      url = `${API_BASE_URL}/articles?tag=${selectedTag}&limit=10&&page=${page}`;
+      url = `${API_BASE_URL}/articles?tag=${selectedTag}&limit=10&page=${page}`;
     } else {
-      url = `${API_BASE_URL}/articles?limit=10&&page=${page}`;
+      url = `${API_BASE_URL}/articles?limit=10&page=${page}`;
     }
 
     axios
@@ -136,8 +135,8 @@ const Home = () => {
   };
 
   const filteredTags = tags.filter(tag => 
-    tag.toLowerCase().includes(tagSearch.toLowerCase())
-  );
+    tag.toLowerCase().includes(tagSearch.toLowerCase()) && tag.trim() !== ''
+  ).slice(0, 10);
 
   return (
     <div className="home-page">
@@ -205,20 +204,18 @@ const Home = () => {
                         {article.author.username}
                       </a>
                       <span className="date">
-                      {new Date(article.createdAt).toLocaleString('vi-VN', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false
-                      })}
+                        {new Date(article.createdAt).toLocaleString('vi-VN', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        })}
                       </span>
                     </div>
                     <button
-                      className={`btn btn-outline-primary btn-sm pull-xs-right ${
-                        favorites[article.slug] ? "favorited" : ""
-                      }`}
+                      className={`btn btn-outline-primary btn-sm pull-xs-right ${favorites[article.slug] ? "favorited" : ""}`}
                       onClick={() => handleFavorite(article.slug)}
                     >
                       <IoIosHeart className="icon" /> {article.favoritesCount}
@@ -257,7 +254,7 @@ const Home = () => {
                 />
               </div>
               <div className="tag-list">
-                {filteredTags.slice(1, 10).map((tag) => (
+                {filteredTags.map((tag) => (
                   <a
                     href="#"
                     className="tag-pill"
