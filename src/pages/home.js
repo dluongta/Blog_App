@@ -57,11 +57,11 @@ const Home = () => {
 
     let url;
     if (feedType === "your" && currentUser) {
-      url = `${API_BASE_URL}/articles?author=${currentUser.username}&limit=10&offset=${(page - 1) * 10}`;
+      url = `${API_BASE_URL}/articles?author=${currentUser.username}&limit=10&page=${page}`;
     } else if (selectedTag) {
-      url = `${API_BASE_URL}/articles?tag=${selectedTag}&limit=10&offset=${(page - 1) * 10}`;
+      url = `${API_BASE_URL}/articles?tag=${selectedTag}&limit=10&&page=${page}`;
     } else {
-      url = `${API_BASE_URL}/articles?limit=10&offset=${(page - 1) * 10}`;
+      url = `${API_BASE_URL}/articles?limit=10&&page=${page}`;
     }
 
     axios
